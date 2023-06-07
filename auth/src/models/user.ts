@@ -1,13 +1,13 @@
-import mongoose from "mongoose";
-import { PasswordManager } from "../services/password-manager";
+import mongoose from 'mongoose';
+import { PasswordManager } from '../services/password-manager';
 
-interface UserAttributes {
+interface UserAttrs {
   email: string;
   password: string;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
-  build(attributes: UserAttributes): UserDoc;
+  build(attrs: UserAttrs): UserDoc;
 }
 
 interface UserDoc extends mongoose.Document {
@@ -35,21 +35,21 @@ const userSchema = new mongoose.Schema(
         delete ret.__v;
       },
     },
-  }
+  },
 );
 
-userSchema.pre("save", async function (done) {
-  if (this.isModified("password")) {
-    const hashed = await PasswordManager.toHash(this.get("password"));
-    this.set("password", hashed);
+userSchema.pre('save', async function (done) {
+  if (this.isModified('password')) {
+    const hashed = await PasswordManager.toHash(this.get('password'));
+    this.set('password', hashed);
   }
   done();
 });
 
-userSchema.statics.build = (attributes: UserAttributes) => {
-  return new User(attributes);
+userSchema.statics.build = (attrs: UserAttrs) => {
+  return new User(attrs);
 };
 
-const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
+const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
 export { User };
